@@ -1,4 +1,4 @@
-package pgk 
+package pkg
 
 import (
 	"fmt"
@@ -64,13 +64,35 @@ type WheelConfig struct{
 }
 
 
-func WithDefaults() *WheelConfig{
-	return &WheelConfig{
+type Option func(*WheelConfig)
+
+
+func Config(opts ...Option) *WheelConfig{
+	cfg := &WheelConfig{
 		Interval: time.Duration(10)*time.Millisecond,
 		SlotSize: 1000,
 		ExpirationHandler: nil,
 	}
+	for _, opt := range opts{
+		opt(cfg)
+	}
+	return cfg
+}
 
+func WithInterval(interval time.Duration) Option{
+	return func(cfg *WheelConfig){
+		cfg.Interval = interval
+	}
+}
+func WithHandler(ch chan <- *Record) Option{
+	return func(cfg *WheelConfig){
+		cfg.ExpirationHandler = ch
+	}
+}
+func WithSlotSize(slotSize int) Option{
+	return func(cfg *WheelConfig){
+		cfg.SlotSize =slotSize 
+	}
 }
 
 
@@ -80,7 +102,7 @@ creates a new TimeWheel
 */
 func NewTimeWheel(config *WheelConfig) *TimeWheel{
 	if config == nil{
-		config = WithDefaults()
+		config = Config()
 	}
 	tw := &TimeWheel{
 		ticker: time.NewTicker(config.Interval),	

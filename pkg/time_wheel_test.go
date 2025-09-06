@@ -15,7 +15,8 @@ import (
 func TestAdd(t *testing.T){
 
 	ch := make(chan *Record)
-	tw := NewTimeWheel(WithDefaults())
+	tw := NewTimeWheel(Config(
+		 WithHandler(ch)))
 	for i:= 3 ; i< 100; i++ {
 		tw.Add(time.Now().Add(time.Duration(i)*time.Second),uuid.New())
 	}
