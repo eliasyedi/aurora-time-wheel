@@ -126,9 +126,10 @@ func (w *TimeWheel) Add(expireAt time.Time, uuid uuid.UUID){
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	ttl := expireAt.Sub(time.Now())
+	fmt.Println("ttl -> ", ttl.Seconds())
 	//need to calculate wheel turn
-	fmt.Println("ticks-> ", math.Ceil(float64(ttl)/float64(w.interval)))
-	ticks := int(math.Ceil(float64(ttl)/float64(w.interval)))
+	fmt.Println("ticks-> ", math.Floor(float64(ttl)/float64(w.interval)))
+	ticks := int(math.Floor(float64(ttl)/float64(w.interval)))
 	pos := (w.currentPos + ticks) % w.slotCount
 	fmt.Println("currentPos-> ", w.currentPos)
 	fmt.Println("pos-> ", pos)
